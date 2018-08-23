@@ -1,18 +1,13 @@
 
-var getDepthIncrease = function(c){
+var isOpener = function(c){
     switch (c) {
         case '{':
         case '[':
         case '(':
-            return 1;
-            break;
-        case '}':
-        case ']':
-        case ')':
-            return -1;
+            return true;
             break;
         default:
-            return 0;
+            return false;
             break;
     }
 }
@@ -42,21 +37,25 @@ var isBalanced = function(subject){
     var onlyBraces = characterArray.filter(function(c){
         return (c == '{' || c == '}' || c == '[' || c == ']' || c == '(' || c == ')');
     });
+    
+    var currentOpenBraces = [];
 
-    console.log(onlyBraces);
-
-    var lastBracket = getBraceType(onlyBraces[0]);
-    var depth = 1;
-    for (let i = 1; i < onlyBraces.length; i++) {
-        var bracket = onlyBraces[i];
-        var depthIncrease = getDepthIncrease(bracket);
-        depth += depthIncrease;
-        if(lastBracket !== getBraceType(bracket) && depthIncrease == -1){ return false; }
-        lastBracket = bracket;
+    for (let i = 0; i < onlyBraces.length; i++) {
+        const element = onlyBraces[i];
+        if(isOpener(element)){
+            currentOpenBraces.push(element);
+        } else {
+            var lastBraceType = getBraceType(currentOpenBraces[currentOpenBraces.length-1]);
+            if(getBraceType(element) !== lastBraceType){
+                return false;
+            } else {
+                currentOpenBraces.pop();
+            }
+        }
     }
 
-    //if(depth != 1)
-    //    return false;
+    if(currentOpenBraces.length > 0)
+        return false;
 
     return true;
 };
@@ -64,5 +63,3 @@ var isBalanced = function(subject){
 console.log(isBalanced('(foo {bar (baz) [boo]})'));
 console.log(isBalanced('foo {bar { baz }'));
 console.log(isBalanced('foo {(bar [baz]})'));
-
-//isBalanced('[ { you: "arent sure", i: "moveForward" }, { we: "love_this" } ]');
